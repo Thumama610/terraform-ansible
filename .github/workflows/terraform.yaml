@@ -38,6 +38,12 @@ jobs:
       - name: Debug IP
         run: echo "EC2 IP is $EC2_IP"
 
+      - name: create key file
+        run: |
+          mkdir -p ~/.ssh/aws.pem
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aws.pem
+          chmod 600 ~/.ssh/aws.pem
+
       - name: Setup Ansible
         run: sudo apt update && sudo apt install -y ansible
 
