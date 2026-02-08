@@ -11,6 +11,12 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ID }}:role/${{ secrets.AWS_ROLE_NAME }}
+          aws-region: ${{ vars.REGION }}
+      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
