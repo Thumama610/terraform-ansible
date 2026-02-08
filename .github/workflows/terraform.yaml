@@ -1,0 +1,38 @@
+name: Terraform + Ansible Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+      
+      - name: Get EC2 Public IP
+        id: tf_output
+        run: |
+          echo "EC2_IP=$(terraform output -raw instance_public_ip)" >> $GITHUB_ENV
+
+      - name: Debug IP
+        run: echo "EC2 IP is $EC2_IP"
+
+      - name: Setup Ansible
+        run: sudo apt update && sudo apt install -y ansible
+
+      - name: Run Ansible
+        env:
+          EC2_IP: ${{ env.EC2_IP }}
+        run: |
+          ansible-playbook -i "$EC2_IP," install_nginx.yml
